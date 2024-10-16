@@ -35,7 +35,8 @@ urlpatterns = [
     #path('submit/', PerevalAddedViewSet.as_view({'post': 'submitData'}), name='submit'),
     # path('', RedirectView.as_view(url='submit/')),
     path('', include(router.urls)),
-    path('perevaladded/', PerevalAddedViewSet.as_view({'get': 'retrieve_perevaladded_object'}), name='perevaladded-detail'),
-    path('patch/<int:id>/', PerevalAddedViewSet.as_view({'get': 'submitDataUpdate', 'patch': 'submitDataUpdate'}), name='perevaladded-detail'),
+    path('perevaladded/', PerevalAddedViewSet.as_view({'get': 'retrieve'}), name='retrieve'),
+    path('perevaladded/<int:pk>', PerevalAddedViewSet.as_view({'get': 'retrieve'}), name='retrieve'),
+    path('perevaladded/patch/<int:pk>/', PerevalAddedViewSet.as_view({'get': 'update', 'patch': 'update'}), name='pupdate'),
     path('email/<str:email>/', PerevalAddedViewSet.as_view({'get': 'submitDataByEmail'}), name='submit-by-email'),
 ]
