@@ -53,13 +53,34 @@ class PerevalAddedViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+
     def update(self, request, pk=None, partial=False):
         pereval = PerevalAdded.objects.get(pk=pk)
-        serializer = PerevalAddedSerializer(pereval, data=request.data, partial=partial,  context={'request': request})
+        serializer = PerevalAddedSerializer(pereval, data=request.data, partial=partial,
+                                                context={'request': request})
         if serializer.is_valid():
+            user_data = request.data.get('user')
+            if user_data is not None:
+                instance_user = pereval.user
+                validating_user_fields = [
+                    instance_user.email != user_data.get('email'),
+                    instance_user.phone != user_data.get('phone'),
+                    instance_user.fam != user_data.get('fam'),
+                    instance_user.name != user_data.get('name'),
+                    instance_user.otc != user_data.get('otc'),
+                ]
+                if any(validating_user_fields):
+                    return Response({"message": "Данные пользователя не могут быть изменены"},
+                                    status=status.HTTP_400_BAD_REQUEST)
+
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
 
     @action(detail=False, methods=['get'])
     def submitDataByEmail(self, request, email=None):
