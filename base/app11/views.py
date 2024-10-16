@@ -24,6 +24,7 @@ class ImagesViewSet(viewsets.ModelViewSet):
     queryset = Images.objects.all()
     serializer_class = ImagesSerializer
 
+
 class PerevalAddedViewSet(viewsets.ModelViewSet):
     serializer_class = PerevalAddedSerializer
     queryset = PerevalAdded.objects.all()
@@ -32,7 +33,6 @@ class PerevalAddedViewSet(viewsets.ModelViewSet):
         context = super(PerevalAddedViewSet, self).get_serializer_context()
         context.update({'request': self.request})
         return context
-
 
     def retrieve(self, request, pk=None):
         if pk:
@@ -45,7 +45,6 @@ class PerevalAddedViewSet(viewsets.ModelViewSet):
         else:
             return Response({"message": "ID parameter is required"}, status=status.HTTP_400_BAD_REQUEST)
 
-
     def create(self, request):
         serializer = PerevalAddedSerializer(data=request.data)
         if serializer.is_valid():
@@ -53,12 +52,10 @@ class PerevalAddedViewSet(viewsets.ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-
     def update(self, request, pk=None, partial=False):
         pereval = PerevalAdded.objects.get(pk=pk)
-        serializer = PerevalAddedSerializer(pereval, data=request.data, partial=partial,
-                                                context={'request': request})
+        serializer = PerevalAddedSerializer(pereval, data=request.data, partial=partial, context={'request': request})
+
         if serializer.is_valid():
             user_data = request.data.get('user')
             if user_data is not None:
@@ -71,16 +68,13 @@ class PerevalAddedViewSet(viewsets.ModelViewSet):
                     instance_user.otc != user_data.get('otc'),
                 ]
                 if any(validating_user_fields):
-                    return Response({"message": "Данные пользователя не могут быть изменены"},
+                    return Response({"state": 0, "message": "Данные пользователя не могут быть изменены"},
                                     status=status.HTTP_400_BAD_REQUEST)
 
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            return Response({"state": 1, "message": "Запись успешно отредактирована"}, status=status.HTTP_200_OK)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
+        return Response({"state": 0, "message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(detail=False, methods=['get'])
     def submitDataByEmail(self, request, email=None):
